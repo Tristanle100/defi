@@ -1,0 +1,100 @@
+program helicop;
+
+uses SDL2,SDL2_image;
+
+var
+   Running: Boolean = True;
+   sdlWindow1: PSDL_Window;
+   sdlRenderer: PSDL_Renderer;
+   sdlSurface1: PSDL_Surface;
+   sdlKeyboardState: PUInt8;
+   sdlTexture1: PSDL_Texture;
+   sdlTexture2: PSDL_Texture;
+   sdlTexture3: TSDL_Rect;
+   sdlTexture4: TSDL_Rect;
+   i: integer;
+
+begin
+    //Creation des parametres de la fenetre
+    if sdl_init( sdl_init_video OR sdl_init_audio ) < 0 then halt;
+
+    sdlWindow1 := sdl_CreateWindow('Window1', SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN);
+        if sdlWindow1 = nil then Halt;
+
+    sdlRenderer := SDL_CreateRenderer(sdlWindow1, -1, 0);
+        if sdlRenderer = nil then Halt;
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 'nearest');
+
+
+    //Affichage de rider.bmp
+    sdlSurface1 := SDL_LoadBMP('bgnd.bmp');
+        if sdlSurface1 = nil then Halt;
+
+    sdlTexture1 := SDL_CreateTextureFromSurface(sdlRenderer, sdlSurface1);
+      if sdlTexture1 = nil then Halt;
+
+    SDL_RenderCopy(sdlRenderer, sdlTexture1, nil, nil);
+    SDL_RenderPresent(sdlRenderer);
+
+//Affichage de helicopter.png
+    sdlTexture2 := IMG_LoadTexture(sdlRenderer,'helicopter.jpg');
+        if sdlTexture2 = nil then Halt;
+    //Affichage du RectHelico frame 1 (helico.png) et du PosScreen (position sur l'ecran)
+    sdltexture3.x := 0;
+    sdltexture3.y := 0;
+    sdltexture3.w := 128;
+    sdltexture3.h := 55;
+    sdltexture4.x := 0;
+    sdltexture4.y := 0;
+    sdltexture4.w := 128;
+    sdltexture4.h := 55;
+
+
+    //Boucle 
+  while Running = True do
+    begin
+        SDL_PumpEvents;
+        sdlKeyboardState := SDL_GetKeyboardState(nil);
+
+        //Eteindre le jeu
+        if sdlKeyboardState[SDL_SCANCODE_ESCAPE] = 1 then
+        Running := false;
+
+        //Déplacement
+        if sdlKeyboardState[SDL_SCANCODE_W] = 1 then
+            sdltexture3.y := sdltexture3.y -2;
+        if sdlKeyboardState[SDL_SCANCODE_A] = 1 then
+            sdltexture3.x := sdltexture3.x -2;
+        if sdlKeyboardState[SDL_SCANCODE_S] = 1 then
+            sdltexture3.y := sdltexture3.y +2;
+        if sdlKeyboardState[SDL_SCANCODE_D] = 1 then
+            sdltexture3.x := sdltexture3.x +2;
+
+
+    //frame
+    sdlTexture4.x := sdlTexture4.x +128;
+      if sdlTexture4.x > 512 then
+      begin
+      sdlTexture4.x := 0;
+      end;
+      SDL_RenderCopy(sdlRenderer, sdlTexture1, nil, nil);
+      SDL_RenderCopy(sdlRenderer, sdlTexture2, @sdltexture4, @sdlTexture3);
+      SDL_RenderPresent(sdlRenderer);
+      SDL_Delay(1);
+      SDL_RenderClear(sdlRenderer);
+    end;
+
+  //Destruction des elements
+    SDL_DestroyTexture(sdlTexture2);
+    SDL_DestroyTexture(sdlTexture1);
+    SDL_FreeSurface(sdlSurface1);
+    SDL_DestroyRenderer(sdlRenderer);
+    SDL_DestroyWindow (sdlWindow1);
+
+  //closing SDL2
+  SDL_Quit;
+
+end.                             
+END.
+
